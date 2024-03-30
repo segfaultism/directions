@@ -13,12 +13,16 @@
     "@chakra-ui/react": "^2.8.2",
     "@emotion/react": "^11.11.4",
     "@emotion/styled": "^11.11.0",
+    "@googlemaps/js-api-loader": "^1.16.6",
+    "@react-google-maps/api": "^2.19.3",
     "framer-motion": "^11.0.20",
+    "google-polyline": "^1.0.3",
     "react": "^18.2.0",
     "react-dom": "^18.2.0",
-    "react-google-autocomplete": "^2.7.3",
+    "react-icons": "^5.0.1",
     "react-router-dom": "^6.22.3",
-    "remixicon": "^4.2.0"
+    "remixicon": "^4.2.0",
+    "use-places-autocomplete": "^4.0.1"
   },
   "devDependencies": {
     "@types/react": "^18.2.66",

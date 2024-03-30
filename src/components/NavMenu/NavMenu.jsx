@@ -55,9 +55,9 @@ const NavMenu = () => {
               <Box py="10px" px="24px">About</Box>
             </NavLink>
 
-            <Link to="/settings">
+            {/* <Link to="/settings">
               <Box py="10px" px="24px">Settings</Box>
-            </Link>
+            </Link> */}
           </DrawerBody>
 
         </DrawerContent>

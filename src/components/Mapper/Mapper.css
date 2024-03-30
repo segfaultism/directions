@@ -1,0 +1,12 @@
+.search-button:active,
+.search-button:visited,
+.search-button:link,
+.search-button:enabled {
+    background-color: #121212;
+    color: #efefef;
+}
+
+.search-button {
+    background-color: #121212;
+    color: #efefef;
+}
