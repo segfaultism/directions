@@ -16,9 +16,11 @@ import {
   Marker,
   Autocomplete,
   DirectionsRenderer,
+  DirectionsService,
 } from "@react-google-maps/api";
 import { useRef, useState } from "react";
 import { FaLocationArrow, FaTimes } from "react-icons/fa";
+//import { decode } from "google-polyline";
 
 import "./Mapper.css";
 
@@ -35,6 +37,10 @@ const Mapper = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
+  // const [isLocOnEdge, setIsLocOnEdge] = useState(false);
+  let tripPath = "";
+  let routePoly = "";
+  let isLocOnEdge = false;
 
   /** @type React.MutableRefObject<HTMLInputElement> */
   const originRef = useRef();
@@ -45,22 +51,72 @@ const Mapper = () => {
     return <SkeletonText />;
   }
 
-  async function calculateRoute() {
+  function calculateRoute() {
     if (originRef.current.value === "" || destinationRef.current.value === "") {
       return;
     }
+
     // eslint-disable-next-line no-undef
     const directionsService = new google.maps.DirectionsService();
-    const results = await directionsService.route({
-      origin: originRef.current.value,
-      destination: destinationRef.current.value,
-      // eslint-disable-next-line no-undef
-      travelMode: google.maps.TravelMode.DRIVING,
-    });
-    setDirectionsResponse(results);
-    setDistance(results.routes[0].legs[0].distance.text);
-    setDuration(results.routes[0].legs[0].duration.text);
+    directionsService.route(
+      {
+        origin: originRef.current.value,
+        destination: destinationRef.current.value,
+        // eslint-disable-next-line no-undef
+        travelMode: google.maps.TravelMode.DRIVING,
+      },
+      (result, status) => {
+        // eslint-disable-next-line no-undef
+        if (status === google.maps.DirectionsStatus.OK) {
+          // eslint-disable-next-line no-undef
+          routePoly = new google.maps.Polyline({
+            path: result.routes[0].overview_path,
+          });
+          tripPath = result.routes[0].overview_path;
+          setDirectionsResponse(result);
+          setDistance(result.routes[0].legs[0].distance.text);
+          isLocOnEdge = checkLocationOnRoute(
+            { lat: 9.000773817210234, lng: 7.4247825800350995 },
+            result.routes[0].overview_path
+          );
+          let something = calculateDistance(result.routes[0].legs[0].start_location.lat(),
+          result.routes[0].legs[0].start_location.lng(), 9.000773817210234, 7.4247825800350995);
+          console.log(isLocOnEdge);
+          console.log(something);
+        } else {
+          console.error(`error fetching directions ${result}`);
+        }
+      }
+    );
   }
+
+  // async function calculateRoute() {
+  //   if (originRef.current.value === "" || destinationRef.current.value === "") {
+  //     return;
+  //   }
+  //   // eslint-disable-next-line no-undef
+  //   const directionsService = new google.maps.DirectionsService();
+  //   const results = await directionsService.route({
+  //     origin: originRef.current.value,
+  //     destination: destinationRef.current.value,
+  //     // eslint-disable-next-line no-undef
+  //     travelMode: google.maps.TravelMode.DRIVING,
+  //   });
+  //   //eslint-disable-next-line no-undef
+  //   routePoly = new google.maps.Polyline({
+  //     path: results.routes[0].overview_path,
+  //   });
+  //   tripPath = results.routes[0].overview_path;
+
+  //   setDirectionsResponse(results);
+  //   setDistance(results.routes[0].legs[0].distance.text);
+  //   setDuration(results.routes[0].legs[0].duration.text);
+  //   isLocOnEdge = checkLocationOnRoute(
+  //     { lat: 9.000773817210234, lng: 7.4247825800350995 },
+  //     results.routes[0].overview_path,
+  //   );
+  //   console.log(isLocOnEdge);
+  // }
 
   function clearRoute() {
     setDirectionsResponse(null);
@@ -68,6 +124,54 @@ const Mapper = () => {
     setDuration("");
     originRef.current.value = "";
     destinationRef.current.value = "";
+    tripPath = "";
+    isLocOnEdge = false;
+  }
+
+  function checkLocationOnRoute(coord, poly) {
+    poly = routePoly;
+    //eslint-disable-next-line no-undef
+    return google.maps.geometry.poly.isLocationOnEdge(coord, poly, 10e-4);
+  }
+
+  function calculateDistance(lat1, lon1, lat2, lon2) {
+    const R = 6371; // Radius of the earth in km
+    const dLat = deg2rad(lat2 - lat1); // deg2rad below
+    const dLon = deg2rad(lon2 - lon1);
+    const a =
+      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
+      Math.cos(deg2rad(lat1)) *
+        Math.cos(deg2rad(lat2)) *
+        Math.sin(dLon / 2) *
+        Math.sin(dLon / 2);
+    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
+    const d = R * c; // Distance in km
+    return d;
+  }
+
+  function deg2rad(deg) {
+    return deg * (Math.PI / 180);
+  }
+
+  function makeSteps() {
+    let stops = [
+      {
+        name: 'galadima-park',
+        location: { lat: 9.000773817210234, lng: 7.4247825800350995 },
+      },
+      {
+        name: 'coca-cola-junction',
+        location: { lat: 9.025409820450733, lng: 7.411018588742447 },
+      },
+      {
+        name: 'airport-junction',
+        location: { lat: 9.063944868849863, lng: 7.410415820146386 },
+      },
+      {
+        name: 'idu-junction',
+        location: { lat: 9.036488220963722, lng: 7.411936998664936 },
+      }
+    ];
   }
 
   return (
