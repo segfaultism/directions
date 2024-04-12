@@ -1,12 +1,10 @@
-import React from "react";
 import TopBar from "../../components/TopBar/TopBar";
+import PropTypes from 'prop-types';
 import {
   Box,
   Heading,
-  VStack,
   Grid,
   Text,
-  Image,
   Flex,
 } from "@chakra-ui/react";
 
@@ -21,7 +19,7 @@ const About = () => {
               Our Story
             </Text>
             <Box borderWidth={1} borderRadius="lg" p="10px" mt={4}>
-              Describe your company's origin story here. Briefly explain how it
+              Describe your company&apos;s origin story here. Briefly explain how it
               came to be and what inspired its creation. You can mention the
               founding team, core values, or any significant milestones.
             </Box>
@@ -32,7 +30,7 @@ const About = () => {
             </Text>
             <Box borderWidth={1} borderRadius="lg" p="10px" mt={4}>
               Outline the core services or products your company offers. Briefly
-              explain how they solve problems or add value to your customers'
+              explain how they solve problems or add value to your customers&apos;
               lives. You can mention your target audience and unique selling
               points here.
             </Box>
@@ -61,5 +59,10 @@ const TeamMember = ({ name, title }) => (
     <Text>{title}</Text>
   </Box>
 );
+
+TeamMember.propTypes = {
+  name: PropTypes.string.isRequired,
+  title: PropTypes.string.isRequired,
+};
 
 export default About;
