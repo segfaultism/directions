@@ -79,44 +79,21 @@ const Mapper = () => {
             { lat: 9.000773817210234, lng: 7.4247825800350995 },
             result.routes[0].overview_path
           );
-          let something = calculateDistance(result.routes[0].legs[0].start_location.lat(),
-          result.routes[0].legs[0].start_location.lng(), 9.000773817210234, 7.4247825800350995);
+          let something = calculateDistance(
+            result.routes[0].legs[0].start_location.lat(),
+            result.routes[0].legs[0].start_location.lng(),
+            9.000773817210234,
+            7.4247825800350995
+          );
           console.log(isLocOnEdge);
           console.log(something);
+          makeSteps();
         } else {
           console.error(`error fetching directions ${result}`);
         }
       }
     );
   }
-
-  // async function calculateRoute() {
-  //   if (originRef.current.value === "" || destinationRef.current.value === "") {
-  //     return;
-  //   }
-  //   // eslint-disable-next-line no-undef
-  //   const directionsService = new google.maps.DirectionsService();
-  //   const results = await directionsService.route({
-  //     origin: originRef.current.value,
-  //     destination: destinationRef.current.value,
-  //     // eslint-disable-next-line no-undef
-  //     travelMode: google.maps.TravelMode.DRIVING,
-  //   });
-  //   //eslint-disable-next-line no-undef
-  //   routePoly = new google.maps.Polyline({
-  //     path: results.routes[0].overview_path,
-  //   });
-  //   tripPath = results.routes[0].overview_path;
-
-  //   setDirectionsResponse(results);
-  //   setDistance(results.routes[0].legs[0].distance.text);
-  //   setDuration(results.routes[0].legs[0].duration.text);
-  //   isLocOnEdge = checkLocationOnRoute(
-  //     { lat: 9.000773817210234, lng: 7.4247825800350995 },
-  //     results.routes[0].overview_path,
-  //   );
-  //   console.log(isLocOnEdge);
-  // }
 
   function clearRoute() {
     setDirectionsResponse(null);
@@ -156,22 +133,51 @@ const Mapper = () => {
   function makeSteps() {
     let stops = [
       {
-        name: 'galadima-park',
+        name: "galadima-park",
         location: { lat: 9.000773817210234, lng: 7.4247825800350995 },
+        vehicles: ["car", "tricycle"],
       },
       {
-        name: 'coca-cola-junction',
+        name: "coca-cola-junction",
         location: { lat: 9.025409820450733, lng: 7.411018588742447 },
+        vehicles: ["car", "tricycle"],
       },
       {
-        name: 'airport-junction',
+        name: "airport-junction",
         location: { lat: 9.063944868849863, lng: 7.410415820146386 },
+        vehicles: ["car", "tricycle"],
       },
       {
-        name: 'idu-junction',
+        name: "idu-junction",
         location: { lat: 9.036488220963722, lng: 7.411936998664936 },
-      }
+        vehicles: ["car", "tricycle"],
+      },
     ];
+    let validStops = [];
+
+    stops.forEach((stop) => {
+      if (checkLocationOnRoute(stop.location, routePoly)) {
+        validStops.push(stop);
+      }
+    });
+
+    validStops.sort((a, b) => {
+      let aDist = calculateDistance(
+        a.location.lat,
+        a.location.lng,
+        9.000773817210234,
+        7.4247825800350995
+      );
+      let bDist = calculateDistance(
+        b.location.lat,
+        b.location.lng,
+        9.000773817210234,
+        7.4247825800350995
+      );
+      return aDist - bDist;
+    });
+
+    console.log(validStops);
   }
 
   return (
