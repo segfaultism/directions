@@ -17,6 +17,7 @@ const router = createBrowserRouter([
     element: <About />,
     errorElement: <ErrorPage />,
   }
+  //TODO: add steps page
 ])
 
 ReactDOM.createRoot(document.getElementById('root')).render(

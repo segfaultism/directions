@@ -16,11 +16,12 @@ import {
   Marker,
   Autocomplete,
   DirectionsRenderer,
+  //eslint-disable-next-line no-unused-vars
   DirectionsService,
 } from "@react-google-maps/api";
 import { useRef, useState } from "react";
 import { FaLocationArrow, FaTimes } from "react-icons/fa";
-//import { decode } from "google-polyline";
+import { Car, Tricycle, Bike } from "../vehicles/Vehicles";
 
 import "./Mapper.css";
 
@@ -37,10 +38,46 @@ const Mapper = () => {
   const [directionsResponse, setDirectionsResponse] = useState(null);
   const [distance, setDistance] = useState("");
   const [duration, setDuration] = useState("");
-  // const [isLocOnEdge, setIsLocOnEdge] = useState(false);
-  let tripPath = "";
+  // let tripPath = "";
   let routePoly = "";
-  let isLocOnEdge = false;
+  let stops = [
+    {
+      name: "galadima-park",
+      location: { lat: 9.000773817210234, lng: 7.4247825800350995 },
+      vehicles: ["car", "tricycle"],
+      coverage: [
+        { lat: 9.063944868849863, lng: 7.410415820146386 }, // airport-junction
+        { lat: 8.97364163497078, lng: 7.495721998664707 }, // apo
+      ],
+      // TODO: ADD POLYGON FOR CARS IF POSSIBLE
+    },
+    {
+      name: "coca-cola-junction",
+      location: { lat: 9.025409820450733, lng: 7.411018588742447 },
+      vehicles: ["tricycle"],
+      coverage: [
+        { lat: 9.063944868849863, lng: 7.410415820146386 }, // airport-junction
+        { lat: 9.000773817210234, lng: 7.4247825800350995 }, // galadima
+      ],
+    },
+    {
+      name: "airport-junction",
+      location: { lat: 9.063944868849863, lng: 7.410415820146386 },
+      vehicles: ["tricycle", "car"],
+      coverage: [
+        { lat: 9.072910884447833, lng: 7.410329304700747 }, // jabi
+        { lat: 9.000773817210234, lng: 7.4247825800350995 }, // galadima
+      ],
+    },
+    {
+      name: "idu-junction",
+      location: { lat: 9.036460760344085, lng: 7.4119189771769 },
+      vehicles: ["tricycle"],
+      coverage: [
+        { lat: 9.063944868849863, lng: 7.410415820146386 }, // airport-junction
+        { lat: 9.000773817210234, lng: 7.4247825800350995 } // galadima
+      ], },
+  ];
 
   /** @type React.MutableRefObject<HTMLInputElement> */
   const originRef = useRef();
@@ -72,22 +109,21 @@ const Mapper = () => {
           routePoly = new google.maps.Polyline({
             path: result.routes[0].overview_path,
           });
-          tripPath = result.routes[0].overview_path;
+          //tripPath = result.routes[0].overview_path;
           setDirectionsResponse(result);
           setDistance(result.routes[0].legs[0].distance.text);
-          isLocOnEdge = checkLocationOnRoute(
-            { lat: 9.000773817210234, lng: 7.4247825800350995 },
-            result.routes[0].overview_path
-          );
-          let something = calculateDistance(
-            result.routes[0].legs[0].start_location.lat(),
-            result.routes[0].legs[0].start_location.lng(),
-            9.000773817210234,
-            7.4247825800350995
-          );
-          console.log(isLocOnEdge);
-          console.log(something);
-          makeSteps();
+          // calculateDistance(
+          //   result.routes[0].legs[0].start_location.lat(),
+          //   result.routes[0].legs[0].start_location.lng(),
+          //   result.routes[0].legs[0].end_location.lat(),
+          //   result.routes[0].legs[0].end_location.lng()
+          // )
+          //   .then((distance) => console.log(distance))
+          //   .catch((error) =>
+          //     console.log(`we no fit get that og distance ${error}`)
+          //   );
+          //console.log(checkLocationOnRoute({ lat: 9.036460760344085, lng: 7.4119189771769 }, routePoly));
+          makeSteps(result.routes[0].legs[0].start_location);
         } else {
           console.error(`error fetching directions ${result}`);
         }
@@ -101,8 +137,7 @@ const Mapper = () => {
     setDuration("");
     originRef.current.value = "";
     destinationRef.current.value = "";
-    tripPath = "";
-    isLocOnEdge = false;
+    //tripPath = "";
   }
 
   function checkLocationOnRoute(coord, poly) {
@@ -112,72 +147,233 @@ const Mapper = () => {
   }
 
   function calculateDistance(lat1, lon1, lat2, lon2) {
-    const R = 6371; // Radius of the earth in km
-    const dLat = deg2rad(lat2 - lat1); // deg2rad below
-    const dLon = deg2rad(lon2 - lon1);
-    const a =
-      Math.sin(dLat / 2) * Math.sin(dLat / 2) +
-      Math.cos(deg2rad(lat1)) *
-        Math.cos(deg2rad(lat2)) *
-        Math.sin(dLon / 2) *
-        Math.sin(dLon / 2);
-    const c = 2 * Math.atan2(Math.sqrt(a), Math.sqrt(1 - a));
-    const d = R * c; // Distance in km
-    return d;
+    //eslint-disable-next-line no-undef
+    const directionsService = new google.maps.DirectionsService();
+    //eslint-disable-next-line no-undef
+    const start = new google.maps.LatLng(lat1, lon1);
+    //eslint-disable-next-line no-undef
+    const end = new google.maps.LatLng(lat2, lon2);
+
+    return new Promise((resolve, reject) => {
+      directionsService.route(
+        {
+          origin: start,
+          destination: end,
+          //eslint-disable-next-line no-undef
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          //eslint-disable-next-line no-undef
+          if (status === google.maps.DirectionsStatus.OK) {
+            const distance = result.routes[0].legs[0].distance.value;
+            resolve(distance);
+          } else {
+            reject(`Error calculating distance: ${status}`);
+          }
+        }
+      );
+    });
   }
 
-  function deg2rad(deg) {
-    return deg * (Math.PI / 180);
-  }
-
-  function makeSteps() {
-    let stops = [
-      {
-        name: "galadima-park",
-        location: { lat: 9.000773817210234, lng: 7.4247825800350995 },
-        vehicles: ["car", "tricycle"],
-      },
-      {
-        name: "coca-cola-junction",
-        location: { lat: 9.025409820450733, lng: 7.411018588742447 },
-        vehicles: ["car", "tricycle"],
-      },
-      {
-        name: "airport-junction",
-        location: { lat: 9.063944868849863, lng: 7.410415820146386 },
-        vehicles: ["car", "tricycle"],
-      },
-      {
-        name: "idu-junction",
-        location: { lat: 9.036488220963722, lng: 7.411936998664936 },
-        vehicles: ["car", "tricycle"],
-      },
-    ];
+  async function makeSteps(origin) {
     let validStops = [];
-
     stops.forEach((stop) => {
       if (checkLocationOnRoute(stop.location, routePoly)) {
         validStops.push(stop);
       }
     });
-
-    validStops.sort((a, b) => {
-      let aDist = calculateDistance(
-        a.location.lat,
-        a.location.lng,
-        9.000773817210234,
-        7.4247825800350995
+    console.log('validStops', validStops);
+    // Map the array to an array of Promises
+    const distancePromises = validStops.map(async (stop) => {
+      const distance = await calculateDistance(
+        stop.location.lat,
+        stop.location.lng,
+        // Replace these with the coordinates you're calculating distance to
+        origin.lat(),
+        origin.lng()
       );
-      let bDist = calculateDistance(
-        b.location.lat,
-        b.location.lng,
-        9.000773817210234,
-        7.4247825800350995
-      );
-      return aDist - bDist;
+      return { stop, distance };
     });
 
-    console.log(validStops);
+    // Wait for all Promises to resolve
+    const stopsWithDistances = await Promise.all(distancePromises);
+
+    // Sort the array based on the distances
+    const sortedStops = stopsWithDistances.sort(
+      (a, b) => a.distance - b.distance
+    );
+
+    // Map the array back to an array of stops
+    let sortedValidStops = sortedStops.map(({ stop }) => stop);
+    console.log('sortedValidStops', sortedValidStops);
+
+    let stopovers = [sortedValidStops[0]];
+
+    for (let i = 1; i < sortedValidStops.length; i++) {
+      let furthestStop = null;
+      let distance = 0;
+      let maxDistance = 0;
+
+      for (let j = i; j < sortedValidStops.length; j++) {
+        let currentPoly;
+        getPolyline(...sortedValidStops[i].coverage)
+          .then((poly) => {
+            currentPoly = poly;
+            if (
+              checkLocationOnRoute(sortedValidStops[j].location, currentPoly)
+            ) {
+              calculateDistance(
+                stopovers[stopovers.length - 1].location.lat,
+                stopovers[stopovers.length - 1].location.lng,
+                sortedValidStops[j].location.lat,
+                sortedValidStops[j].location.lng
+              )
+                .then((result) => {
+                  distance = result;
+                  console.log(i, maxDistance, distance);
+
+                  if (distance > maxDistance) {
+                    maxDistance = distance;
+                    furthestStop = sortedValidStops[j];
+                    if (furthestStop) {
+                      stopovers.push(furthestStop);
+                      // Remove the added stop from validStops
+                      sortedValidStops = sortedValidStops.filter(
+                        (stop) => stop !== furthestStop
+                      );
+                      // Reset the loop to check the remaining stops from the beginning
+                      i = 0;
+                    }
+                  }
+                  console.log(stopovers);
+                })
+                .catch(
+                  (error) =>
+                    `distance in makeStep function cannot be calculated: ${error}`
+                );
+            }
+          })
+          .catch((error) => console.log(`the poly was not obtained ${error}`));
+      }
+    }
+  }
+
+  // function makeSteps(origin) {
+  //   //TODO: Remove hardcoded values
+  //   let validStops = [];
+
+  //   stops.forEach((stop) => {
+  //     if (checkLocationOnRoute(stop.location, routePoly)) {
+  //       validStops.push(stop);
+  //     }
+  //   });
+
+  //   validStops.sort((a, b) => {
+  //     let aDist;
+  //     let bDist;
+  //     calculateDistance(
+  //       a.location.lat,
+  //       a.location.lng,
+  //       origin.lat(),
+  //       origin.lng()
+  //     )
+  //       .then((distance) => (aDist = distance))
+  //       .catch((error) => console.log(`assignment to aDist failed ${error}`));
+  //     calculateDistance(
+  //       b.location.lat,
+  //       b.location.lng,
+  //       origin.lat(),
+  //       origin.lng()
+  //     )
+  //       .then((distance) => (bDist = distance))
+  //       .catch((error) => console.log(`assignment to bDist failed ${error}`));
+  //     console.log(aDist, bDist);
+  //     return aDist - bDist;
+  //   });
+
+  //   console.log(validStops);
+
+  //   let stopovers = [validStops[0]];
+
+  //   for (let i = 1; i < validStops.length; i++) {
+  //     let furthestStop = null;
+  //     let maxDistance = 0;
+
+  //     for (let j = i; j < validStops.length; j++) {
+  //       let currentPoly;
+  //       getPolyline(...validStops[i].coverage)
+  //       .then(poly => currentPoly = poly)
+  //       .catch(error => console.log(`the poly was not obtained ${error}`))
+  //       if (
+  //         checkLocationOnRoute(
+  //           validStops[j].location,
+  //           currentPoly
+  //         )
+  //       ) {
+  //         const distance = calculateDistance(
+  //           stopovers[stopovers.length - 1].location.lat,
+  //           stopovers[stopovers.length - 1].location.lng,
+  //           validStops[j].location.lat,
+  //           validStops[j].location.lng
+  //         );
+
+  //         if (distance > maxDistance) {
+  //           maxDistance = distance;
+  //           furthestStop = validStops[j];
+  //         }
+  //       }
+  //     }
+
+  //     if (furthestStop) {
+  //       stopovers.push(furthestStop);
+  //       // Remove the added stop from validStops
+  //       validStops = validStops.filter((stop) => stop !== furthestStop);
+  //       // Reset the loop to check the remaining stops from the beginning
+  //       i = 0;
+  //     }
+  //   }
+
+  //   console.log(stopovers);
+  // }
+
+  function getPolyline(...args) {
+    //eslint-disable-next-line no-undef
+    const directionsService = new google.maps.DirectionsService();
+
+    const start = args[0];
+    const end = args[args.length - 1];
+    const waypoints = args.slice(1, -1).map((location) => ({
+      location: location,
+      stopover: true,
+    }));
+
+    return new Promise((resolve, reject) => {
+      directionsService.route(
+        {
+          origin: start,
+          destination: end,
+          waypoints: waypoints,
+          optimizeWaypoints: true,
+          //eslint-disable-next-line no-undef
+          travelMode: google.maps.TravelMode.DRIVING,
+        },
+        (result, status) => {
+          //eslint-disable-next-line no-undef
+          if (status === google.maps.DirectionsStatus.OK) {
+            const polylinePath = result.routes[0].overview_path;
+            //eslint-disable-next-line no-undef
+            const polyline = new google.maps.Polyline({
+              path: polylinePath,
+              geodesic: true,
+              strokeColor: "#FF0000",
+            });
+            resolve(polyline);
+          } else {
+            reject(`Error: ${status}`);
+          }
+        }
+      );
+    });
   }
 
   return (
@@ -247,7 +443,7 @@ const Mapper = () => {
           {duration ? <Text>Duration: {duration}</Text> : null}
         </HStack>
       </Box>
-      <Box h="100%" w="100%">
+      <Box minH="420px" maxH="100%" w="100%">
         <GoogleMap
           center={center}
           zoom={12}
@@ -266,6 +462,18 @@ const Mapper = () => {
             <DirectionsRenderer directions={directionsResponse} />
           )}
         </GoogleMap>
+        <Box
+          p={4}
+          bgColor="white"
+          shadow="base"
+          w="100%"
+          flexDirection="column"
+          h="100px"
+          className="confirm-steps"
+          style={{ display: "flex", justifyContent: "center" }}
+        >
+          <Button>Confirm Route</Button>
+        </Box>
       </Box>
     </Flex>
   );

@@ -1,4 +1,3 @@
-import { useState } from 'react'
 import { useLocation } from 'react-router-dom'
 import NavMenu from '../NavMenu/NavMenu.jsx'
 import "./TopBar.css"
