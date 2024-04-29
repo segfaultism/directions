@@ -12,17 +12,17 @@ const Car = () => {
 const Tricycle = () => {
     return (
         <Box>
-           <i className="ri-car-fill"></i> 
+           <i className="ri-e-bike-fill"></i> 
         </Box>
     )
 }
 
-const Bike = () => {
+const Walk = () => {
     return (
         <Box>
-            <i className="ri-motorbike-fill"></i>
+            <i className="ri-walk-fill"></i>
         </Box>
     )
 }
 
-export { Car, Tricycle, Bike }
+export { Car, Tricycle, Walk }
