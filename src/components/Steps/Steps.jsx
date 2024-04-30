@@ -15,13 +15,13 @@ const Steps = ({ renderedSteps, isLoading }) => {
     // return (renderedSteps.map((stop, index) => (<div key={index}>{stop.name}</div>)))
     return (
         <Flex fontSize='3vw' alignItems='center' marginBottom='10px' justifyContent='center'>
-            <Box padding='10px' bgColor='#efefef' borderRadius='md' marginRight='10px' >
+            <Box padding='10px' bgColor='gray.100' borderRadius='md' marginRight='10px' >
                 <Walk />
             </Box>
             <i className="ri-arrow-right-line" style={{ marginRight: '10px' }}></i>
             {renderedSteps ? renderedSteps.map((stopover, index) => (
                 <Box key={index} display='flex' alignItems='center'>
-                    <Box display='flex' borderRadius='md' margin='10px 10px 10px 0' bgColor='#efefef' padding='10px'>
+                    <Box display='flex' borderRadius='md' margin='10px 10px 10px 0' bgColor='gray.100' padding='10px'>
                         {
                             stopover.vehicles[0] === 'car' ? <Car /> : stopover.vehicles[0] === 'tricycle' ? <Tricycle /> : <Walk />
                         }
@@ -29,7 +29,7 @@ const Steps = ({ renderedSteps, isLoading }) => {
                     <i className="ri-arrow-right-line" style={{ marginRight: '10px' }}></i>
                 </Box>
             )) : null}
-            <Box padding='10px' bgColor='#efefef' borderRadius='md'>
+            <Box padding='10px' bgColor='gray.100' borderRadius='md'>
                 <Walk />
             </Box>
         </Flex>
