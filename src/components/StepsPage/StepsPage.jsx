@@ -16,7 +16,7 @@ const StepsPage = ({ start, end, renderedSteps, setRenderedSteps, isLoading }) =
             ...step,
             vehicles: vehicleCombinations[selectedOption][index],
         }));
-        console.log(`new Rendered Steps`, newRenderedSteps)
+        (`new Rendered Steps`, newRenderedSteps)
         setRenderedSteps(newRenderedSteps);
     }
 
@@ -138,12 +138,10 @@ const StepsPage = ({ start, end, renderedSteps, setRenderedSteps, isLoading }) =
                                     <option key={index} value={index}>walk&nbsp;-&gt;&nbsp;{
                                         combination.map((vehicle, index) => (
                                             <span key={index} >
-                                                <span>
                                                     {
                                                         vehicle[0] === 'car' ? 'car' : vehicle[0] === 'tricycle' ? 'tricycle' : 'walk'
                                                     }
-                                                </span>
-                                                &nbsp;-&gt;&nbsp;
+                                                    {" -> "}
                                             </span>
                                         ))
                                     }walk</option>

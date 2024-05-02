@@ -126,7 +126,7 @@ const Mapper = () => {
               setIsLoading(false);
             })
             .catch(error => {
-              console.log(`no stopovers bro: ${error}`);
+              (`no stopovers bro: ${error}`);
               setIsLoading(false);
             });
         } else {
@@ -228,8 +228,8 @@ const Mapper = () => {
         let poly = await getPolyline(...sortedValidStops[i].coverage);
 
         if (checkLocationOnRoute(sortedValidStops[j].location, poly)) {
-          console.log(sortedValidStops[j].name, sortedValidStops[i].name);
-          console.log(checkLocationOnRoute(dest, poly))
+          (sortedValidStops[j].name, sortedValidStops[i].name);
+          (checkLocationOnRoute(dest, poly))
           let distance = await calculateDistance(
             stopovers[stopovers.length - 1].location.lat,
             stopovers[stopovers.length - 1].location.lng,

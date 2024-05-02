@@ -4,7 +4,7 @@ import { Car, Tricycle, Walk } from "../vehicles/Vehicles";
 import { useEffect } from 'react';
 
 const Steps = ({ renderedSteps, isLoading }) => {
-    console.log(renderedSteps);
+    (renderedSteps);
 
     useEffect(() => {
         //
