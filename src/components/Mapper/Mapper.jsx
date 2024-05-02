@@ -58,7 +58,7 @@ const Mapper = () => {
     {
       name: "Coca-Cola Junction",
       location: { lat: 9.025409820450733, lng: 7.411018588742447 },
-      vehicles: ["tricycle"],
+      vehicles: ["tricycle", "car"],
       coverage: [
         { lat: 9.063944868849863, lng: 7.410415820146386 }, // airport-junction
         { lat: 9.000773817210234, lng: 7.4247825800350995 }, // galadima
@@ -389,7 +389,7 @@ const Mapper = () => {
         >
           {stopovers.length > 0 ? <Steps renderedSteps={renderedSteps} isLoading={isLoading} /> : null}
           {/* {!(isLoading) ? renderedSteps.map((stop, index) => <div key={index}>{stop.name}</div>) : null} */}
-          {(stopovers.length > 0) ? <StepsPage renderedSteps={renderedSteps} isLoading={isLoading} start={originRef.current.value} end={destinationRef.current.value}/> : null}
+          {(stopovers.length > 0) ? <StepsPage renderedSteps={renderedSteps} setRenderedSteps={setRenderedSteps} isLoading={isLoading} start={originRef.current.value} end={destinationRef.current.value}/> : null}
         </Box>
       </Box>
     </Flex>
